@@ -70,7 +70,7 @@ const { Article, User, sequelize } = db;
 
 ## Database Schema
 
-Comprehensive schema documentation is maintained in `docs/modelsDescriptions.md`. Key relationships include:
+Comprehensive schema documentation is maintained in `docs/DATABASE_SCHEMA_OVERVIEW.md`. Key relationships include:
 
 - Complex many-to-many relationships through junction tables
 - Self-referencing relationships (Article duplicates)

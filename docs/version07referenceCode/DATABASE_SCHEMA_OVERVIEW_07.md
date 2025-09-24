@@ -1,4 +1,4 @@
-# Model Descriptions
+# Database Schema Overview (version 07)
 
 This document provides detailed schema descriptions for all database tables (models) in the NewsNexus07Db system.
 
@@ -12,7 +12,7 @@ NewsNexus07Db/
 ├── package.json                 # Dependencies: sequelize, sqlite3
 ├── docs/
 │   ├── images/
-│   └── modelsDescriptions.md    # This file
+│   └── DATABASE_SCHEMA_OVERVIEW_07.md    # This file
 ├── models/                      # Database models directory
 │   ├── _index.js               # Central model registry and exports
 │   ├── _connection.js          # Database connection configuration
