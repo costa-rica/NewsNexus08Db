@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Conversion to TypeScript
+
+This project will have all the code stored in a src/ directory and the compiled code stored in a dist/ directory. The entry point to this applicaiton will will be a file named index.ts in the src/ directory. There rest of the folder structure should follow that found in the docs/version07referenceCode/ directory.
+
+## TypeScript Refactor (Next Task)
+
+This project (`NewsNexus08Db`) is the foundation for the version 8 platform suite. The next major task is a **full TypeScript refactor**, not a minimal change. The goal is to **ship types** so that downstream apps benefit from strong typing. The refactor will include:
+
+- Converting `.js` files in `/models` and `index.js` into `.ts`.
+- Adding a proper `tsconfig.json` with `"declaration": true`.
+- Publishing both compiled JavaScript and `.d.ts` declaration files.
+- Organizing the project so files are structured in a clean, idiomatic way (src/, dist/, etc.).
+
+Claude (the code assistant) will be responsible for performing this refactor.
+
 ## Project Overview
 
 NewsNexus07Db is a Sequelize-based SQLite database module designed as a foundational component for a news aggregation platform. It serves as a shared database layer that can be imported as a dependency by other applications in the NewsNexus microservices ecosystem.
