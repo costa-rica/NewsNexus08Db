@@ -17,14 +17,50 @@ This project (`NewsNexus08Db`) is the foundation for the version 8 platform suit
 
 Claude (the code assistant) will be responsible for performing this refactor.
 
-## installation
+## Build Instructions
+
+To build the TypeScript source code and generate the dist/ directory for package distribution:
+
+```bash
+# Build the project (compile TypeScript to dist/)
+npm run build
+
+# Clean the dist/ directory
+npm run clean
+
+# Development mode with watch (rebuilds on file changes)
+npm run dev
+
+# Clean and build (used automatically before publishing)
+npm run prepublishOnly
+```
+
+The build process will:
+- Compile TypeScript source files from `src/` to JavaScript in `dist/`
+- Generate `.d.ts` type declaration files for consuming TypeScript projects
+- Create source maps for debugging
+
+## Installation
 
 1. `npm init -y`
 2. `npm install sequelize sqlite3`
 
-## import to other apps
+## Import to Other Apps
 
-`npm install file:../NewsNexus08Db`
+```bash
+# Install as local file dependency
+npm install file:../NewsNexus08Db
+```
+
+```typescript
+// Import in TypeScript projects (with full type support)
+import db from 'newsnexus08db';
+const { Article, User, sequelize } = db;
+
+// Or in JavaScript projects
+const db = require('newsnexus08db');
+const { Article, User, sequelize } = db;
+```
 
 ## Environmental Variables
 
