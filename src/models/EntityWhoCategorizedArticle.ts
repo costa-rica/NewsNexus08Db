@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface EntityWhoCategorizedArticleAttributes {
   id: number;
@@ -9,7 +9,7 @@ interface EntityWhoCategorizedArticleAttributes {
 
 interface EntityWhoCategorizedArticleCreationAttributes extends Optional<EntityWhoCategorizedArticleAttributes, 'id' | 'userId' | 'artificialIntelligenceId'> {}
 
-class EntityWhoCategorizedArticle extends Model<EntityWhoCategorizedArticleAttributes, EntityWhoCategorizedArticleCreationAttributes> implements EntityWhoCategorizedArticleAttributes {
+export class EntityWhoCategorizedArticle extends Model<EntityWhoCategorizedArticleAttributes, EntityWhoCategorizedArticleCreationAttributes> implements EntityWhoCategorizedArticleAttributes {
   public id!: number;
   public userId!: number | null;
   public artificialIntelligenceId!: number | null;
@@ -18,26 +18,29 @@ class EntityWhoCategorizedArticle extends Model<EntityWhoCategorizedArticleAttri
   public readonly updatedAt!: Date;
 }
 
-EntityWhoCategorizedArticle.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initEntityWhoCategorizedArticle() {
+  EntityWhoCategorizedArticle.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+      },
+      artificialIntelligenceId: {
+        type: DataTypes.INTEGER,
+      },
     },
-    userId: {
-      type: DataTypes.INTEGER,
-    },
-    artificialIntelligenceId: {
-      type: DataTypes.INTEGER,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'EntityWhoCategorizedArticle',
-    tableName: 'EntityWhoCategorizedArticles',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'EntityWhoCategorizedArticle',
+      tableName: 'EntityWhoCategorizedArticles',
+      timestamps: true,
+    }
+  );
+  return EntityWhoCategorizedArticle;
+}
 
 export default EntityWhoCategorizedArticle;

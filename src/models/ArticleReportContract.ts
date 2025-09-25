@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleReportContractAttributes {
   id: number;
@@ -12,7 +12,7 @@ interface ArticleReportContractAttributes {
 
 interface ArticleReportContractCreationAttributes extends Optional<ArticleReportContractAttributes, 'id' | 'articleReferenceNumberInReport' | 'articleAcceptedByCpsc' | 'articleRejectionReason'> {}
 
-class ArticleReportContract extends Model<ArticleReportContractAttributes, ArticleReportContractCreationAttributes> implements ArticleReportContractAttributes {
+export class ArticleReportContract extends Model<ArticleReportContractAttributes, ArticleReportContractCreationAttributes> implements ArticleReportContractAttributes {
   public id!: number;
   public reportId!: number;
   public articleId!: number;
@@ -24,38 +24,41 @@ class ArticleReportContract extends Model<ArticleReportContractAttributes, Artic
   public readonly updatedAt!: Date;
 }
 
-ArticleReportContract.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleReportContract() {
+  ArticleReportContract.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      reportId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      articleReferenceNumberInReport: {
+        type: DataTypes.STRING,
+      },
+      articleAcceptedByCpsc: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      articleRejectionReason: {
+        type: DataTypes.STRING,
+      },
     },
-    reportId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    articleReferenceNumberInReport: {
-      type: DataTypes.STRING,
-    },
-    articleAcceptedByCpsc: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    articleRejectionReason: {
-      type: DataTypes.STRING,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleReportContract',
-    tableName: 'ArticleReportContracts',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleReportContract',
+      tableName: 'ArticleReportContracts',
+      timestamps: true,
+    }
+  );
+  return ArticleReportContract;
+}
 
 export default ArticleReportContract;

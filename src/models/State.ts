@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface StateAttributes {
   id: number;
@@ -9,7 +9,7 @@ interface StateAttributes {
 
 interface StateCreationAttributes extends Optional<StateAttributes, 'id'> {}
 
-class State extends Model<StateAttributes, StateCreationAttributes> implements StateAttributes {
+export class State extends Model<StateAttributes, StateCreationAttributes> implements StateAttributes {
   public id!: number;
   public name!: string;
   public abbreviation!: string;
@@ -18,28 +18,31 @@ class State extends Model<StateAttributes, StateCreationAttributes> implements S
   public readonly updatedAt!: Date;
 }
 
-State.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initState() {
+  State.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      abbreviation: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    abbreviation: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'State',
-    tableName: 'States',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'State',
+      tableName: 'States',
+      timestamps: true,
+    }
+  );
+  return State;
+}
 
 export default State;

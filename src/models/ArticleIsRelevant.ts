@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleIsRelevantAttributes {
   id: number;
@@ -11,7 +11,7 @@ interface ArticleIsRelevantAttributes {
 
 interface ArticleIsRelevantCreationAttributes extends Optional<ArticleIsRelevantAttributes, 'id' | 'isRelevant' | 'kmNotes'> {}
 
-class ArticleIsRelevant extends Model<ArticleIsRelevantAttributes, ArticleIsRelevantCreationAttributes> implements ArticleIsRelevantAttributes {
+export class ArticleIsRelevant extends Model<ArticleIsRelevantAttributes, ArticleIsRelevantCreationAttributes> implements ArticleIsRelevantAttributes {
   public id!: number;
   public userId!: number;
   public articleId!: number;
@@ -22,35 +22,38 @@ class ArticleIsRelevant extends Model<ArticleIsRelevantAttributes, ArticleIsRele
   public readonly updatedAt!: Date;
 }
 
-ArticleIsRelevant.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleIsRelevant() {
+  ArticleIsRelevant.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      isRelevant: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      kmNotes: {
+        type: DataTypes.STRING,
+      },
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    isRelevant: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    kmNotes: {
-      type: DataTypes.STRING,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleIsRelevant',
-    tableName: 'ArticleIsRelevants',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleIsRelevant',
+      tableName: 'ArticleIsRelevants',
+      timestamps: true,
+    }
+  );
+  return ArticleIsRelevant;
+}
 
 export default ArticleIsRelevant;

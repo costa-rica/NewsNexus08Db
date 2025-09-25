@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleReviewedAttributes {
   id: number;
@@ -11,7 +11,7 @@ interface ArticleReviewedAttributes {
 
 interface ArticleReviewedCreationAttributes extends Optional<ArticleReviewedAttributes, 'id' | 'isReviewed' | 'kmNotes'> {}
 
-class ArticleReviewed extends Model<ArticleReviewedAttributes, ArticleReviewedCreationAttributes> implements ArticleReviewedAttributes {
+export class ArticleReviewed extends Model<ArticleReviewedAttributes, ArticleReviewedCreationAttributes> implements ArticleReviewedAttributes {
   public id!: number;
   public userId!: number;
   public articleId!: number;
@@ -22,35 +22,38 @@ class ArticleReviewed extends Model<ArticleReviewedAttributes, ArticleReviewedCr
   public readonly updatedAt!: Date;
 }
 
-ArticleReviewed.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleReviewed() {
+  ArticleReviewed.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      isReviewed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      kmNotes: {
+        type: DataTypes.STRING,
+      },
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    isReviewed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    kmNotes: {
-      type: DataTypes.STRING,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleReviewed',
-    tableName: 'ArticleRevieweds',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleReviewed',
+      tableName: 'ArticleRevieweds',
+      timestamps: true,
+    }
+  );
+  return ArticleReviewed;
+}
 
 export default ArticleReviewed;

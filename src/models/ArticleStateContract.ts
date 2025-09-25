@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleStateContractAttributes {
   id: number;
@@ -9,7 +9,7 @@ interface ArticleStateContractAttributes {
 
 interface ArticleStateContractCreationAttributes extends Optional<ArticleStateContractAttributes, 'id'> {}
 
-class ArticleStateContract extends Model<ArticleStateContractAttributes, ArticleStateContractCreationAttributes> implements ArticleStateContractAttributes {
+export class ArticleStateContract extends Model<ArticleStateContractAttributes, ArticleStateContractCreationAttributes> implements ArticleStateContractAttributes {
   public id!: number;
   public articleId!: number;
   public stateId!: number;
@@ -18,28 +18,31 @@ class ArticleStateContract extends Model<ArticleStateContractAttributes, Article
   public readonly updatedAt!: Date;
 }
 
-ArticleStateContract.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleStateContract() {
+  ArticleStateContract.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      stateId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    stateId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleStateContract',
-    tableName: 'ArticleStateContracts',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleStateContract',
+      tableName: 'ArticleStateContracts',
+      timestamps: true,
+    }
+  );
+  return ArticleStateContract;
+}
 
 export default ArticleStateContract;

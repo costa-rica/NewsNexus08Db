@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleDuplicateRatingAttributes {
   id: number;
@@ -20,7 +20,7 @@ interface ArticleDuplicateRatingAttributes {
 
 interface ArticleDuplicateRatingCreationAttributes extends Optional<ArticleDuplicateRatingAttributes, 'id' | 'urlCheck' | 'contentHash' | 'embeddingSearch' | 'signatureMatchDate' | 'signatureMatchState' | 'signatureMatchProduct' | 'signatureMatchHazard' | 'signatureMatchPlace' | 'signatureMatchPeople' | 'score' | 'scoreWeighted'> {}
 
-class ArticleDuplicateRating extends Model<ArticleDuplicateRatingAttributes, ArticleDuplicateRatingCreationAttributes> implements ArticleDuplicateRatingAttributes {
+export class ArticleDuplicateRating extends Model<ArticleDuplicateRatingAttributes, ArticleDuplicateRatingCreationAttributes> implements ArticleDuplicateRatingAttributes {
   public id!: number;
   public articleIdNew!: number;
   public articleIdApproved!: number;
@@ -40,7 +40,8 @@ class ArticleDuplicateRating extends Model<ArticleDuplicateRatingAttributes, Art
   public readonly updatedAt!: Date;
 }
 
-ArticleDuplicateRating.init(
+export function initArticleDuplicateRating() {
+  ArticleDuplicateRating.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -139,6 +140,8 @@ ArticleDuplicateRating.init(
       { fields: ["articleIdApproved"] },
     ],
   }
-);
+  );
+  return ArticleDuplicateRating;
+}
 
 export default ArticleDuplicateRating;

@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArtificialIntelligenceAttributes {
   id: number;
@@ -11,7 +11,7 @@ interface ArtificialIntelligenceAttributes {
 
 interface ArtificialIntelligenceCreationAttributes extends Optional<ArtificialIntelligenceAttributes, 'id' | 'description' | 'huggingFaceModelName' | 'huggingFaceModelType'> {}
 
-class ArtificialIntelligence extends Model<ArtificialIntelligenceAttributes, ArtificialIntelligenceCreationAttributes> implements ArtificialIntelligenceAttributes {
+export class ArtificialIntelligence extends Model<ArtificialIntelligenceAttributes, ArtificialIntelligenceCreationAttributes> implements ArtificialIntelligenceAttributes {
   public id!: number;
   public name!: string;
   public description!: string | null;
@@ -22,33 +22,36 @@ class ArtificialIntelligence extends Model<ArtificialIntelligenceAttributes, Art
   public readonly updatedAt!: Date;
 }
 
-ArtificialIntelligence.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArtificialIntelligence() {
+  ArtificialIntelligence.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.STRING,
+      },
+      huggingFaceModelName: {
+        type: DataTypes.STRING,
+      },
+      huggingFaceModelType: {
+        type: DataTypes.STRING,
+      },
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-    },
-    huggingFaceModelName: {
-      type: DataTypes.STRING,
-    },
-    huggingFaceModelType: {
-      type: DataTypes.STRING,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArtificialIntelligence',
-    tableName: 'ArtificialIntelligences',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArtificialIntelligence',
+      tableName: 'ArtificialIntelligences',
+      timestamps: true,
+    }
+  );
+  return ArtificialIntelligence;
+}
 
 export default ArtificialIntelligence;

@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleEntityWhoCategorizedArticleContractAttributes {
   id: number;
@@ -11,7 +11,7 @@ interface ArticleEntityWhoCategorizedArticleContractAttributes {
 
 interface ArticleEntityWhoCategorizedArticleContractCreationAttributes extends Optional<ArticleEntityWhoCategorizedArticleContractAttributes, 'id' | 'keyword' | 'keywordRating'> {}
 
-class ArticleEntityWhoCategorizedArticleContract extends Model<ArticleEntityWhoCategorizedArticleContractAttributes, ArticleEntityWhoCategorizedArticleContractCreationAttributes> implements ArticleEntityWhoCategorizedArticleContractAttributes {
+export class ArticleEntityWhoCategorizedArticleContract extends Model<ArticleEntityWhoCategorizedArticleContractAttributes, ArticleEntityWhoCategorizedArticleContractCreationAttributes> implements ArticleEntityWhoCategorizedArticleContractAttributes {
   public id!: number;
   public articleId!: number;
   public entityWhoCategorizesId!: number;
@@ -22,7 +22,8 @@ class ArticleEntityWhoCategorizedArticleContract extends Model<ArticleEntityWhoC
   public readonly updatedAt!: Date;
 }
 
-ArticleEntityWhoCategorizedArticleContract.init(
+export function initArticleEntityWhoCategorizedArticleContract() {
+  ArticleEntityWhoCategorizedArticleContract.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -56,6 +57,8 @@ ArticleEntityWhoCategorizedArticleContract.init(
       },
     ],
   }
-);
+  );
+  return ArticleEntityWhoCategorizedArticleContract;
+}
 
 export default ArticleEntityWhoCategorizedArticleContract;

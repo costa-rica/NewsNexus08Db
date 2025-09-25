@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface NewsRssRequestAttributes {
   id: number;
@@ -13,7 +13,7 @@ interface NewsRssRequestAttributes {
 
 interface NewsRssRequestCreationAttributes extends Optional<NewsRssRequestAttributes, 'id' | 'countOfArticlesReceivedFromRequest' | 'countOfArticlesSavedToDbFromRequest' | 'dateStartOfRequest' | 'dateEndOfRequest' | 'gotResponse'> {}
 
-class NewsRssRequest extends Model<NewsRssRequestAttributes, NewsRssRequestCreationAttributes> implements NewsRssRequestAttributes {
+export class NewsRssRequest extends Model<NewsRssRequestAttributes, NewsRssRequestCreationAttributes> implements NewsRssRequestAttributes {
   public id!: number;
   public newsArticleAggregatorSourceId!: number;
   public countOfArticlesReceivedFromRequest!: number | null;
@@ -26,39 +26,42 @@ class NewsRssRequest extends Model<NewsRssRequestAttributes, NewsRssRequestCreat
   public readonly updatedAt!: Date;
 }
 
-NewsRssRequest.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initNewsRssRequest() {
+  NewsRssRequest.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      newsArticleAggregatorSourceId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      countOfArticlesReceivedFromRequest: {
+        type: DataTypes.INTEGER,
+      },
+      countOfArticlesSavedToDbFromRequest: {
+        type: DataTypes.INTEGER,
+      },
+      dateStartOfRequest: {
+        type: DataTypes.DATEONLY,
+      },
+      dateEndOfRequest: {
+        type: DataTypes.DATEONLY,
+      },
+      gotResponse: {
+        type: DataTypes.BOOLEAN,
+      },
     },
-    newsArticleAggregatorSourceId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    countOfArticlesReceivedFromRequest: {
-      type: DataTypes.INTEGER,
-    },
-    countOfArticlesSavedToDbFromRequest: {
-      type: DataTypes.INTEGER,
-    },
-    dateStartOfRequest: {
-      type: DataTypes.DATEONLY,
-    },
-    dateEndOfRequest: {
-      type: DataTypes.DATEONLY,
-    },
-    gotResponse: {
-      type: DataTypes.BOOLEAN,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'NewsRssRequest',
-    tableName: 'NewsRssRequests',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'NewsRssRequest',
+      tableName: 'NewsRssRequests',
+      timestamps: true,
+    }
+  );
+  return NewsRssRequest;
+}
 
 export default NewsRssRequest;

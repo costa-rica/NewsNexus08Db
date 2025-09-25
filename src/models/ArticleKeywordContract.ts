@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleKeywordContractAttributes {
   id: number;
@@ -10,7 +10,7 @@ interface ArticleKeywordContractAttributes {
 
 interface ArticleKeywordContractCreationAttributes extends Optional<ArticleKeywordContractAttributes, 'id'> {}
 
-class ArticleKeywordContract extends Model<ArticleKeywordContractAttributes, ArticleKeywordContractCreationAttributes> implements ArticleKeywordContractAttributes {
+export class ArticleKeywordContract extends Model<ArticleKeywordContractAttributes, ArticleKeywordContractCreationAttributes> implements ArticleKeywordContractAttributes {
   public id!: number;
   public articleId!: number;
   public entityWhoCategorizesId!: number;
@@ -20,32 +20,35 @@ class ArticleKeywordContract extends Model<ArticleKeywordContractAttributes, Art
   public readonly updatedAt!: Date;
 }
 
-ArticleKeywordContract.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleKeywordContract() {
+  ArticleKeywordContract.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      entityWhoCategorizesId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      ranking: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
     },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    entityWhoCategorizesId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    ranking: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleKeywordContract',
-    tableName: 'ArticleKeywordContracts',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleKeywordContract',
+      tableName: 'ArticleKeywordContracts',
+      timestamps: true,
+    }
+  );
+  return ArticleKeywordContract;
+}
 
 export default ArticleKeywordContract;

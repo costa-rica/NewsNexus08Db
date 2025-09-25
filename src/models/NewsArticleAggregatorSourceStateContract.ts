@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface NewsArticleAggregatorSourceStateContractAttributes {
   id: number;
@@ -9,7 +9,7 @@ interface NewsArticleAggregatorSourceStateContractAttributes {
 
 interface NewsArticleAggregatorSourceStateContractCreationAttributes extends Optional<NewsArticleAggregatorSourceStateContractAttributes, 'id'> {}
 
-class NewsArticleAggregatorSourceStateContract extends Model<NewsArticleAggregatorSourceStateContractAttributes, NewsArticleAggregatorSourceStateContractCreationAttributes> implements NewsArticleAggregatorSourceStateContractAttributes {
+export class NewsArticleAggregatorSourceStateContract extends Model<NewsArticleAggregatorSourceStateContractAttributes, NewsArticleAggregatorSourceStateContractCreationAttributes> implements NewsArticleAggregatorSourceStateContractAttributes {
   public id!: number;
   public stateId!: number;
   public newsArticleAggregatorSourceId!: number;
@@ -18,28 +18,31 @@ class NewsArticleAggregatorSourceStateContract extends Model<NewsArticleAggregat
   public readonly updatedAt!: Date;
 }
 
-NewsArticleAggregatorSourceStateContract.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initNewsArticleAggregatorSourceStateContract() {
+  NewsArticleAggregatorSourceStateContract.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      stateId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      newsArticleAggregatorSourceId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
-    stateId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    newsArticleAggregatorSourceId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'NewsArticleAggregatorSourceStateContract',
-    tableName: 'NewsArticleAggregatorSourceStateContracts',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'NewsArticleAggregatorSourceStateContract',
+      tableName: 'NewsArticleAggregatorSourceStateContracts',
+      timestamps: true,
+    }
+  );
+  return NewsArticleAggregatorSourceStateContract;
+}
 
 export default NewsArticleAggregatorSourceStateContract;

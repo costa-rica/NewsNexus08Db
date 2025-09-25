@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleApprovedAttributes {
   id: number;
@@ -16,7 +16,7 @@ interface ArticleApprovedAttributes {
 
 interface ArticleApprovedCreationAttributes extends Optional<ArticleApprovedAttributes, 'id' | 'isApproved' | 'headlineForPdfReport' | 'publicationNameForPdfReport' | 'publicationDateForPdfReport' | 'textForPdfReport' | 'urlForPdfReport' | 'kmNotes'> {}
 
-class ArticleApproved extends Model<ArticleApprovedAttributes, ArticleApprovedCreationAttributes> implements ArticleApprovedAttributes {
+export class ArticleApproved extends Model<ArticleApprovedAttributes, ArticleApprovedCreationAttributes> implements ArticleApprovedAttributes {
   public id!: number;
   public userId!: number;
   public articleId!: number;
@@ -32,50 +32,53 @@ class ArticleApproved extends Model<ArticleApprovedAttributes, ArticleApprovedCr
   public readonly updatedAt!: Date;
 }
 
-ArticleApproved.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleApproved() {
+  ArticleApproved.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      isApproved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      headlineForPdfReport: {
+        type: DataTypes.STRING,
+      },
+      publicationNameForPdfReport: {
+        type: DataTypes.STRING,
+      },
+      publicationDateForPdfReport: {
+        type: DataTypes.DATEONLY,
+      },
+      textForPdfReport: {
+        type: DataTypes.STRING,
+      },
+      urlForPdfReport: {
+        type: DataTypes.STRING,
+      },
+      kmNotes: {
+        type: DataTypes.STRING,
+      },
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    isApproved: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    headlineForPdfReport: {
-      type: DataTypes.STRING,
-    },
-    publicationNameForPdfReport: {
-      type: DataTypes.STRING,
-    },
-    publicationDateForPdfReport: {
-      type: DataTypes.DATEONLY,
-    },
-    textForPdfReport: {
-      type: DataTypes.STRING,
-    },
-    urlForPdfReport: {
-      type: DataTypes.STRING,
-    },
-    kmNotes: {
-      type: DataTypes.STRING,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleApproved',
-    tableName: 'ArticleApproveds',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleApproved',
+      tableName: 'ArticleApproveds',
+      timestamps: true,
+    }
+  );
+  return ArticleApproved;
+}
 
 export default ArticleApproved;

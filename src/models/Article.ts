@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleAttributes {
   id: number;
@@ -17,7 +17,7 @@ interface ArticleAttributes {
 
 interface ArticleCreationAttributes extends Optional<ArticleAttributes, 'id' | 'publicationName' | 'author' | 'title' | 'description' | 'url' | 'urlToImage' | 'publishedDate' | 'entityWhoFoundArticleId' | 'newsApiRequestId' | 'newsRssRequestId'> {}
 
-class Article extends Model<ArticleAttributes, ArticleCreationAttributes> implements ArticleAttributes {
+export class Article extends Model<ArticleAttributes, ArticleCreationAttributes> implements ArticleAttributes {
   public id!: number;
   public publicationName!: string | null;
   public author!: string | null;
@@ -34,50 +34,53 @@ class Article extends Model<ArticleAttributes, ArticleCreationAttributes> implem
   public readonly updatedAt!: Date;
 }
 
-Article.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticle() {
+  Article.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      publicationName: {
+        type: DataTypes.STRING,
+      },
+      author: {
+        type: DataTypes.STRING,
+      },
+      title: {
+        type: DataTypes.STRING,
+      },
+      description: {
+        type: DataTypes.STRING,
+      },
+      url: {
+        type: DataTypes.STRING,
+      },
+      urlToImage: {
+        type: DataTypes.STRING,
+      },
+      publishedDate: {
+        type: DataTypes.DATEONLY,
+      },
+      entityWhoFoundArticleId: {
+        type: DataTypes.INTEGER,
+      },
+      newsApiRequestId: {
+        type: DataTypes.INTEGER,
+      },
+      newsRssRequestId: {
+        type: DataTypes.INTEGER,
+      },
     },
-    publicationName: {
-      type: DataTypes.STRING,
-    },
-    author: {
-      type: DataTypes.STRING,
-    },
-    title: {
-      type: DataTypes.STRING,
-    },
-    description: {
-      type: DataTypes.STRING,
-    },
-    url: {
-      type: DataTypes.STRING,
-    },
-    urlToImage: {
-      type: DataTypes.STRING,
-    },
-    publishedDate: {
-      type: DataTypes.DATEONLY,
-    },
-    entityWhoFoundArticleId: {
-      type: DataTypes.INTEGER,
-    },
-    newsApiRequestId: {
-      type: DataTypes.INTEGER,
-    },
-    newsRssRequestId: {
-      type: DataTypes.INTEGER,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'Article',
-    tableName: 'Articles',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'Article',
+      tableName: 'Articles',
+      timestamps: true,
+    }
+  );
+  return Article;
+}
 
 export default Article;

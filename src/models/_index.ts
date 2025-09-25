@@ -1,59 +1,86 @@
-import sequelize from './_connection';
-import Article from './Article';
-import ArticleApproved from './ArticleApproved';
-import ArticleContent from './ArticleContent';
-import ArticleDuplicateRating from './ArticleDuplicateRating';
-import ArticleEntityWhoCategorizedArticleContract from './ArticleEntityWhoCategorizedArticleContract';
-import ArticleIsRelevant from './ArticleIsRelevant';
-import ArticleKeywordContract from './ArticleKeywordContract';
-import ArticleReportContract from './ArticleReportContract';
-import ArticleReviewed from './ArticleReviewed';
-import ArticleStateContract from './ArticleStateContract';
-import ArtificialIntelligence from './ArtificialIntelligence';
-import EntityWhoCategorizedArticle from './EntityWhoCategorizedArticle';
-import EntityWhoFoundArticle from './EntityWhoFoundArticle';
-import Keyword from './Keyword';
-import NewsApiRequest from './NewsApiRequest';
-import NewsApiRequestWebsiteDomainContract from './NewsApiRequestWebsiteDomainContract';
-import NewsArticleAggregatorSource from './NewsArticleAggregatorSource';
-import NewsArticleAggregatorSourceStateContract from './NewsArticleAggregatorSourceStateContract';
-import NewsRssRequest from './NewsRssRequest';
-import Report from './Report';
-import State from './State';
-import User from './User';
-import WebsiteDomain from './WebsiteDomain';
+import { sequelize } from './_connection';
 
-const db = {
-  sequelize,
-  Article,
-  ArticleApproved,
-  ArticleContent,
-  ArticleDuplicateRating,
-  ArticleEntityWhoCategorizedArticleContract,
-  ArticleIsRelevant,
-  ArticleKeywordContract,
-  ArticleReportContract,
-  ArticleReviewed,
-  ArticleStateContract,
-  ArtificialIntelligence,
-  EntityWhoCategorizedArticle,
-  EntityWhoFoundArticle,
-  Keyword,
-  NewsApiRequest,
-  NewsApiRequestWebsiteDomainContract,
-  NewsArticleAggregatorSource,
-  NewsArticleAggregatorSourceStateContract,
-  NewsRssRequest,
-  Report,
-  State,
-  User,
-  WebsiteDomain,
-};
+import { initArticle, Article } from './Article';
+import { initArticleApproved, ArticleApproved } from './ArticleApproved';
+import { initArticleContent, ArticleContent } from './ArticleContent';
+import { initArticleDuplicateRating, ArticleDuplicateRating } from './ArticleDuplicateRating';
+import { initArticleEntityWhoCategorizedArticleContract, ArticleEntityWhoCategorizedArticleContract } from './ArticleEntityWhoCategorizedArticleContract';
+import { initArticleIsRelevant, ArticleIsRelevant } from './ArticleIsRelevant';
+import { initArticleKeywordContract, ArticleKeywordContract } from './ArticleKeywordContract';
+import { initArticleReportContract, ArticleReportContract } from './ArticleReportContract';
+import { initArticleReviewed, ArticleReviewed } from './ArticleReviewed';
+import { initArticleStateContract, ArticleStateContract } from './ArticleStateContract';
+import { initArtificialIntelligence, ArtificialIntelligence } from './ArtificialIntelligence';
+import { initEntityWhoCategorizedArticle, EntityWhoCategorizedArticle } from './EntityWhoCategorizedArticle';
+import { initEntityWhoFoundArticle, EntityWhoFoundArticle } from './EntityWhoFoundArticle';
+import { initKeyword, Keyword } from './Keyword';
+import { initNewsApiRequest, NewsApiRequest } from './NewsApiRequest';
+import { initNewsApiRequestWebsiteDomainContract, NewsApiRequestWebsiteDomainContract } from './NewsApiRequestWebsiteDomainContract';
+import { initNewsArticleAggregatorSource, NewsArticleAggregatorSource } from './NewsArticleAggregatorSource';
+import { initNewsArticleAggregatorSourceStateContract, NewsArticleAggregatorSourceStateContract } from './NewsArticleAggregatorSourceStateContract';
+import { initNewsRssRequest, NewsRssRequest } from './NewsRssRequest';
+import { initReport, Report } from './Report';
+import { initState, State } from './State';
+import { initUser, User } from './User';
+import { initWebsiteDomain, WebsiteDomain } from './WebsiteDomain';
 
-// Load associations
-import './_associations';
+import { applyAssociations } from './_associations';
 
-export default db;
+export function initModels() {
+  initArticle();
+  initArticleApproved();
+  initArticleContent();
+  initArticleDuplicateRating();
+  initArticleEntityWhoCategorizedArticleContract();
+  initArticleIsRelevant();
+  initArticleKeywordContract();
+  initArticleReportContract();
+  initArticleReviewed();
+  initArticleStateContract();
+  initArtificialIntelligence();
+  initEntityWhoCategorizedArticle();
+  initEntityWhoFoundArticle();
+  initKeyword();
+  initNewsApiRequest();
+  initNewsApiRequestWebsiteDomainContract();
+  initNewsArticleAggregatorSource();
+  initNewsArticleAggregatorSourceStateContract();
+  initNewsRssRequest();
+  initReport();
+  initState();
+  initUser();
+  initWebsiteDomain();
+
+  applyAssociations();
+
+  return {
+    sequelize,
+    Article,
+    ArticleApproved,
+    ArticleContent,
+    ArticleDuplicateRating,
+    ArticleEntityWhoCategorizedArticleContract,
+    ArticleIsRelevant,
+    ArticleKeywordContract,
+    ArticleReportContract,
+    ArticleReviewed,
+    ArticleStateContract,
+    ArtificialIntelligence,
+    EntityWhoCategorizedArticle,
+    EntityWhoFoundArticle,
+    Keyword,
+    NewsApiRequest,
+    NewsApiRequestWebsiteDomainContract,
+    NewsArticleAggregatorSource,
+    NewsArticleAggregatorSourceStateContract,
+    NewsRssRequest,
+    Report,
+    State,
+    User,
+    WebsiteDomain,
+  };
+}
+
 export {
   sequelize,
   Article,

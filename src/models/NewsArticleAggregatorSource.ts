@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface NewsArticleAggregatorSourceAttributes {
   id: number;
@@ -12,7 +12,7 @@ interface NewsArticleAggregatorSourceAttributes {
 
 interface NewsArticleAggregatorSourceCreationAttributes extends Optional<NewsArticleAggregatorSourceAttributes, 'id' | 'nameOfOrg' | 'url' | 'apiKey' | 'isApi' | 'isRss'> {}
 
-class NewsArticleAggregatorSource extends Model<NewsArticleAggregatorSourceAttributes, NewsArticleAggregatorSourceCreationAttributes> implements NewsArticleAggregatorSourceAttributes {
+export class NewsArticleAggregatorSource extends Model<NewsArticleAggregatorSourceAttributes, NewsArticleAggregatorSourceCreationAttributes> implements NewsArticleAggregatorSourceAttributes {
   public id!: number;
   public nameOfOrg!: string | null;
   public url!: string | null;
@@ -24,37 +24,40 @@ class NewsArticleAggregatorSource extends Model<NewsArticleAggregatorSourceAttri
   public readonly updatedAt!: Date;
 }
 
-NewsArticleAggregatorSource.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initNewsArticleAggregatorSource() {
+  NewsArticleAggregatorSource.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      nameOfOrg: {
+        type: DataTypes.STRING,
+      },
+      url: {
+        type: DataTypes.STRING,
+      },
+      apiKey: {
+        type: DataTypes.STRING,
+      },
+      isApi: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      isRss: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
-    nameOfOrg: {
-      type: DataTypes.STRING,
-    },
-    url: {
-      type: DataTypes.STRING,
-    },
-    apiKey: {
-      type: DataTypes.STRING,
-    },
-    isApi: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    isRss: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'NewsArticleAggregatorSource',
-    tableName: 'NewsArticleAggregatorSources',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'NewsArticleAggregatorSource',
+      tableName: 'NewsArticleAggregatorSources',
+      timestamps: true,
+    }
+  );
+  return NewsArticleAggregatorSource;
+}
 
 export default NewsArticleAggregatorSource;

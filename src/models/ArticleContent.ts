@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ArticleContentAttributes {
   id: number;
@@ -9,7 +9,7 @@ interface ArticleContentAttributes {
 
 interface ArticleContentCreationAttributes extends Optional<ArticleContentAttributes, 'id'> {}
 
-class ArticleContent extends Model<ArticleContentAttributes, ArticleContentCreationAttributes> implements ArticleContentAttributes {
+export class ArticleContent extends Model<ArticleContentAttributes, ArticleContentCreationAttributes> implements ArticleContentAttributes {
   public id!: number;
   public articleId!: number;
   public content!: string;
@@ -18,28 +18,31 @@ class ArticleContent extends Model<ArticleContentAttributes, ArticleContentCreat
   public readonly updatedAt!: Date;
 }
 
-ArticleContent.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initArticleContent() {
+  ArticleContent.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      content: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
-    articleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    content: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'ArticleContent',
-    tableName: 'ArticleContents',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'ArticleContent',
+      tableName: 'ArticleContents',
+      timestamps: true,
+    }
+  );
+  return ArticleContent;
+}
 
 export default ArticleContent;

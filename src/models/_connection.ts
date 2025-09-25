@@ -14,4 +14,5 @@ console.log(
   )}`
 );
 
+export { sequelize };
 export default sequelize;

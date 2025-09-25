@@ -34,110 +34,76 @@ NewsNexus08Db/
 └── package.json                 # Project configuration
 ```
 
-### Entry Point: src/index.ts
+## Template (copy for each new model)
 
-```typescript
-import db from './models/_index';
+```ts
+// src/models/Example.ts
+import {
+	DataTypes,
+	Model,
+	InferAttributes,
+	InferCreationAttributes,
+	CreationOptional,
+	ForeignKey,
+	NonAttribute,
+} from "sequelize";
+import { sequelize } from "./_connection";
 
-export default db;
-export * from './models/_index';
+export class Example extends Model<
+	InferAttributes<Example>,
+	InferCreationAttributes<Example>
+> {
+	declare id: CreationOptional<number>;
+	declare name: string;
+
+	// FK example:
+	// declare userId: ForeignKey<User["id"]>;
+	// declare user?: NonAttribute<User>;
+}
+
+export function initExample() {
+	Example.init(
+		{
+			id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+			name: { type: DataTypes.STRING, allowNull: false },
+			// userId: { type: DataTypes.INTEGER, allowNull: false }
+		},
+		{
+			sequelize,
+			tableName: "examples",
+			timestamps: true,
+		}
+	);
+	return Example;
+}
 ```
 
-The main entry point:
-- Imports the centralized database object from `models/_index.ts`
-- Exports both the default db object and all named exports
-- Provides clean API: `import db from 'NewsNexus08Db'` or `import { Article, User } from 'NewsNexus08Db'`
+## Example src/models/\_index.ts
 
-### Core Architecture Files
+```ts
+// SAMPLE of different proejctsrc/models/_index.ts
+import { sequelize } from "./_connection";
 
-#### models/_connection.ts
+import { initExample, Example } from "./Example";
 
-```typescript
-import { Sequelize } from 'sequelize';
-import * as path from 'path';
+import { applyAssociations } from "./_associations";
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(process.env.PATH_DATABASE || '.', process.env.NAME_DB || 'database.sqlite'),
-  logging: false,
-});
+/** Initialize all models and associations once per process. */
+export function initModels() {
+	initExample();
+	applyAssociations();
 
-export default sequelize;
-```
+	return {
+		sequelize,
+		Example,
+	};
+}
 
-**Purpose**: Configures SQLite database connection using environment variables from consuming application.
+// 👇 Export named items for consumers
+export { sequelize, Example };
 
-#### models/_index.ts
-
-**Purpose**: Central model registry that:
-- Imports all 25+ model classes
-- Exports unified `db` object with all models and sequelize instance
-- Loads associations via `import './_associations'`
-- Provides both default and named exports for flexible importing
-
-```typescript
-const db = {
-  sequelize,
-  Article,
-  User,
-  // ... all 25+ models
-};
-
-export default db;
-export { sequelize, Article, User, /* all models */ };
-```
-
-#### models/_associations.ts
-
-**Purpose**: Defines all Sequelize relationships between models:
-- 50+ association definitions
-- Complex many-to-many relationships via junction tables
-- Self-referencing relationships (ArticleDuplicateRating)
-- Foreign key constraints and cascading behaviors
-
-**Key Patterns**:
-- Junction tables for many-to-many: `ArticleKeywordContract`, `ArticleStateContract`
-- Dual entity tracking: User vs AI categorization/discovery
-- Hierarchical relationships: Articles → Content, Reviews, Approvals
-
-### Import Pattern
-
-**As npm dependency** (when published):
-```typescript
-import db from 'newsnexus08db';
-const { Article, User, sequelize } = db;
-
-// Or named imports
-import { Article, User, sequelize } from 'newsnexus08db';
-```
-
-**As local file dependency**:
-```typescript
-import db from '../NewsNexus08Db';
-const { Article, User, sequelize } = db;
-
-// Direct model access
-import { Article } from '../NewsNexus08Db';
-```
-
-**Usage Example**:
-```typescript
-import { Article, User, sequelize } from 'newsnexus08db';
-
-// Initialize database
-await sequelize.authenticate();
-
-// Create article
-const article = await Article.create({
-  title: "Breaking News",
-  author: "Reporter Name",
-  url: "https://example.com/article"
-});
-
-// Query with associations
-const articles = await Article.findAll({
-  include: [User, State]
-});
+// 👇 Export named items for consumers
+export { sequelize, Example };
 ```
 
 ### Database Configuration
@@ -153,137 +119,146 @@ const articles = await Article.findAll({
 ### Core Entity Tables
 
 #### Articles
+
 Main news article storage with metadata.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique article identifier |
-| publicationName | STRING | NULLABLE | News source name |
-| author | STRING | NULLABLE | Article author |
-| title | STRING | NULLABLE | Article headline |
-| description | STRING | NULLABLE | Article summary |
-| url | STRING | NULLABLE | Original article URL |
-| urlToImage | STRING | NULLABLE | Featured image URL |
-| publishedDate | DATEONLY | NULLABLE | Publication date |
-| entityWhoFoundArticleId | INTEGER | FK, NULLABLE | Reference to discovery source |
-| newsApiRequestId | INTEGER | FK, NULLABLE | Reference to NewsAPI request |
-| newsRssRequestId | INTEGER | FK, NULLABLE | Reference to RSS request |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field                   | Type     | Constraints                 | Description                   |
+| ----------------------- | -------- | --------------------------- | ----------------------------- |
+| id                      | INTEGER  | PRIMARY KEY, AUTO_INCREMENT | Unique article identifier     |
+| publicationName         | STRING   | NULLABLE                    | News source name              |
+| author                  | STRING   | NULLABLE                    | Article author                |
+| title                   | STRING   | NULLABLE                    | Article headline              |
+| description             | STRING   | NULLABLE                    | Article summary               |
+| url                     | STRING   | NULLABLE                    | Original article URL          |
+| urlToImage              | STRING   | NULLABLE                    | Featured image URL            |
+| publishedDate           | DATEONLY | NULLABLE                    | Publication date              |
+| entityWhoFoundArticleId | INTEGER  | FK, NULLABLE                | Reference to discovery source |
+| newsApiRequestId        | INTEGER  | FK, NULLABLE                | Reference to NewsAPI request  |
+| newsRssRequestId        | INTEGER  | FK, NULLABLE                | Reference to RSS request      |
+| createdAt               | DATE     | NOT NULL                    | Timestamp                     |
+| updatedAt               | DATE     | NOT NULL                    | Timestamp                     |
 
 #### Users
+
 System users for approval/review workflows.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique user identifier |
-| username | STRING | NOT NULL | User login name |
-| email | STRING | NOT NULL | User email address |
-| password | STRING | NOT NULL | Hashed password |
-| isAdmin | BOOLEAN | DEFAULT false | Admin privileges flag |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field     | Type    | Constraints                 | Description            |
+| --------- | ------- | --------------------------- | ---------------------- |
+| id        | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique user identifier |
+| username  | STRING  | NOT NULL                    | User login name        |
+| email     | STRING  | NOT NULL                    | User email address     |
+| password  | STRING  | NOT NULL                    | Hashed password        |
+| isAdmin   | BOOLEAN | DEFAULT false               | Admin privileges flag  |
+| createdAt | DATE    | NOT NULL                    | Timestamp              |
+| updatedAt | DATE    | NOT NULL                    | Timestamp              |
 
 #### States
+
 US geographic states for filtering.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique state identifier |
-| name | STRING | NOT NULL | Full state name |
-| abbreviation | STRING | NOT NULL | Two-letter state code |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field        | Type    | Constraints                 | Description             |
+| ------------ | ------- | --------------------------- | ----------------------- |
+| id           | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique state identifier |
+| name         | STRING  | NOT NULL                    | Full state name         |
+| abbreviation | STRING  | NOT NULL                    | Two-letter state code   |
+| createdAt    | DATE    | NOT NULL                    | Timestamp               |
+| updatedAt    | DATE    | NOT NULL                    | Timestamp               |
 
 #### Keywords
+
 Categorization keywords for article tagging.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique keyword identifier |
-| keyword | STRING | NOT NULL | Keyword text |
-| category | STRING | NULLABLE | Keyword category/group |
-| isArchived | BOOLEAN | DEFAULT false | Archived status flag |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field      | Type    | Constraints                 | Description               |
+| ---------- | ------- | --------------------------- | ------------------------- |
+| id         | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique keyword identifier |
+| keyword    | STRING  | NOT NULL                    | Keyword text              |
+| category   | STRING  | NULLABLE                    | Keyword category/group    |
+| isArchived | BOOLEAN | DEFAULT false               | Archived status flag      |
+| createdAt  | DATE    | NOT NULL                    | Timestamp                 |
+| updatedAt  | DATE    | NOT NULL                    | Timestamp                 |
 
 ### Content Management Tables
 
 #### ArticleContents
+
 Full article text storage separate from metadata.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique content identifier |
-| articleId | INTEGER | FK, NOT NULL | Reference to Article |
-| content | STRING | NOT NULL | Full article text |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field     | Type    | Constraints                 | Description               |
+| --------- | ------- | --------------------------- | ------------------------- |
+| id        | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique content identifier |
+| articleId | INTEGER | FK, NOT NULL                | Reference to Article      |
+| content   | STRING  | NOT NULL                    | Full article text         |
+| createdAt | DATE    | NOT NULL                    | Timestamp                 |
+| updatedAt | DATE    | NOT NULL                    | Timestamp                 |
 
 #### Reports
+
 Generated report containers for client delivery.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique report identifier |
-| dateSubmittedToClient | DATE | NULLABLE | Client delivery timestamp |
-| nameCrFormat | STRING | NULLABLE | CR format filename |
-| nameZipFile | STRING | NULLABLE | ZIP archive filename |
-| userId | INTEGER | FK, NOT NULL | Report creator reference |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field                 | Type    | Constraints                 | Description               |
+| --------------------- | ------- | --------------------------- | ------------------------- |
+| id                    | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique report identifier  |
+| dateSubmittedToClient | DATE    | NULLABLE                    | Client delivery timestamp |
+| nameCrFormat          | STRING  | NULLABLE                    | CR format filename        |
+| nameZipFile           | STRING  | NULLABLE                    | ZIP archive filename      |
+| userId                | INTEGER | FK, NOT NULL                | Report creator reference  |
+| createdAt             | DATE    | NOT NULL                    | Timestamp                 |
+| updatedAt             | DATE    | NOT NULL                    | Timestamp                 |
 
 ### AI Integration Tables
 
 #### ArtificialIntelligences
+
 AI model definitions for categorization tracking.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique AI model identifier |
-| name | STRING | NOT NULL | Model display name |
-| description | STRING | NULLABLE | Model description |
-| huggingFaceModelName | STRING | NULLABLE | HuggingFace model identifier |
-| huggingFaceModelType | STRING | NULLABLE | Model type classification |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field                | Type    | Constraints                 | Description                  |
+| -------------------- | ------- | --------------------------- | ---------------------------- |
+| id                   | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique AI model identifier   |
+| name                 | STRING  | NOT NULL                    | Model display name           |
+| description          | STRING  | NULLABLE                    | Model description            |
+| huggingFaceModelName | STRING  | NULLABLE                    | HuggingFace model identifier |
+| huggingFaceModelType | STRING  | NULLABLE                    | Model type classification    |
+| createdAt            | DATE    | NOT NULL                    | Timestamp                    |
+| updatedAt            | DATE    | NOT NULL                    | Timestamp                    |
 
 #### EntityWhoCategorizedArticles
+
 Tracks whether human or AI performed categorization.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique entity identifier |
-| userId | INTEGER | FK, NULLABLE | Human categorizer reference |
-| artificialIntelligenceId | INTEGER | FK, NULLABLE | AI model reference |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field                    | Type    | Constraints                 | Description                 |
+| ------------------------ | ------- | --------------------------- | --------------------------- |
+| id                       | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique entity identifier    |
+| userId                   | INTEGER | FK, NULLABLE                | Human categorizer reference |
+| artificialIntelligenceId | INTEGER | FK, NULLABLE                | AI model reference          |
+| createdAt                | DATE    | NOT NULL                    | Timestamp                   |
+| updatedAt                | DATE    | NOT NULL                    | Timestamp                   |
 
 **Note**: Either `userId` OR `artificialIntelligenceId` should be set, not both.
 
 ### Duplicate Detection Tables
 
 #### ArticleDuplicateRatings
+
 Multi-algorithm similarity scoring for duplicate detection.
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique rating identifier |
-| articleIdNew | INTEGER | FK, NOT NULL | New article being evaluated |
-| articleIdApproved | INTEGER | FK, NOT NULL | Approved article to compare against |
-| urlCheck | FLOAT | 0-1 range, NULLABLE | URL similarity score |
-| contentHash | FLOAT | 0-1 range, NULLABLE | Text hash similarity |
-| embeddingSearch | FLOAT | 0-1 range, NULLABLE | Semantic embedding similarity |
-| signatureMatchDate | FLOAT | 0-1 range, NULLABLE | Date proximity score |
-| signatureMatchState | FLOAT | 0-1 range, NULLABLE | Geographic state match |
-| signatureMatchProduct | FLOAT | 0-1 range, NULLABLE | Product/entity match |
-| signatureMatchHazard | FLOAT | 0-1 range, NULLABLE | Hazard/risk match |
-| signatureMatchPlace | FLOAT | 0-1 range, NULLABLE | Location/place match |
-| signatureMatchPeople | FLOAT | 0-1 range, NULLABLE | Named person match |
-| score | FLOAT | 0-1 range, NULLABLE | Unweighted composite score |
-| scoreWeighted | FLOAT | 0-1 range, NULLABLE | Weighted composite score |
-| createdAt | DATE | NOT NULL | Timestamp |
-| updatedAt | DATE | NOT NULL | Timestamp |
+| Field                 | Type    | Constraints                 | Description                         |
+| --------------------- | ------- | --------------------------- | ----------------------------------- |
+| id                    | INTEGER | PRIMARY KEY, AUTO_INCREMENT | Unique rating identifier            |
+| articleIdNew          | INTEGER | FK, NOT NULL                | New article being evaluated         |
+| articleIdApproved     | INTEGER | FK, NOT NULL                | Approved article to compare against |
+| urlCheck              | FLOAT   | 0-1 range, NULLABLE         | URL similarity score                |
+| contentHash           | FLOAT   | 0-1 range, NULLABLE         | Text hash similarity                |
+| embeddingSearch       | FLOAT   | 0-1 range, NULLABLE         | Semantic embedding similarity       |
+| signatureMatchDate    | FLOAT   | 0-1 range, NULLABLE         | Date proximity score                |
+| signatureMatchState   | FLOAT   | 0-1 range, NULLABLE         | Geographic state match              |
+| signatureMatchProduct | FLOAT   | 0-1 range, NULLABLE         | Product/entity match                |
+| signatureMatchHazard  | FLOAT   | 0-1 range, NULLABLE         | Hazard/risk match                   |
+| signatureMatchPlace   | FLOAT   | 0-1 range, NULLABLE         | Location/place match                |
+| signatureMatchPeople  | FLOAT   | 0-1 range, NULLABLE         | Named person match                  |
+| score                 | FLOAT   | 0-1 range, NULLABLE         | Unweighted composite score          |
+| scoreWeighted         | FLOAT   | 0-1 range, NULLABLE         | Weighted composite score            |
+| createdAt             | DATE    | NOT NULL                    | Timestamp                           |
+| updatedAt             | DATE    | NOT NULL                    | Timestamp                           |
 
 **Indexes**: Unique constraint on `(articleIdNew, articleIdApproved)` plus individual field indexes.
 
@@ -298,81 +273,90 @@ The system uses extensive many-to-many relationships via dedicated junction tabl
 - **NewsApiRequestWebsiteDomainContract**: NewsAPI requests ↔ Website domains
 - **NewsArticleAggregatorSourceStateContract**: News sources ↔ States
 
-*All junction tables include `id`, `createdAt`, `updatedAt` plus foreign keys to linked entities.*
+_All junction tables include `id`, `createdAt`, `updatedAt` plus foreign keys to linked entities._
 
 ## Associations / Relationships
 
 ### Core Entity Relationships
 
 #### Article Relationships
+
 Central hub connecting to most other entities:
 
-| Relationship | Target Entity | Type | Foreign Key | Description |
-|-------------|---------------|------|-------------|-------------|
-| Article → ArticleContent | ArticleContent | One-to-Many | articleId | Full text storage |
-| Article → ArticleStateContract | ArticleStateContract | One-to-Many | articleId | State associations |
-| Article → ArticleKeywordContract | ArticleKeywordContract | One-to-Many | articleId | Keyword tagging |
-| Article → ArticleReportContract | ArticleReportContract | One-to-Many | articleId | Report inclusion |
-| Article → ArticleReviewed | ArticleReviewed | One-to-Many | articleId | Review tracking |
-| Article → ArticleApproved | ArticleApproved | One-to-Many | articleId | Approval tracking |
-| Article → ArticleIsRelevant | ArticleIsRelevant | One-to-Many | articleId | Relevance marking |
-| Article → EntityWhoFoundArticle | EntityWhoFoundArticle | Many-to-One | entityWhoFoundArticleId | Discovery attribution |
-| Article → NewsApiRequest | NewsApiRequest | Many-to-One | newsApiRequestId | NewsAPI source |
-| Article → NewsRssRequest | NewsRssRequest | Many-to-One | newsRssRequestId | RSS source |
+| Relationship                     | Target Entity          | Type        | Foreign Key             | Description           |
+| -------------------------------- | ---------------------- | ----------- | ----------------------- | --------------------- |
+| Article → ArticleContent         | ArticleContent         | One-to-Many | articleId               | Full text storage     |
+| Article → ArticleStateContract   | ArticleStateContract   | One-to-Many | articleId               | State associations    |
+| Article → ArticleKeywordContract | ArticleKeywordContract | One-to-Many | articleId               | Keyword tagging       |
+| Article → ArticleReportContract  | ArticleReportContract  | One-to-Many | articleId               | Report inclusion      |
+| Article → ArticleReviewed        | ArticleReviewed        | One-to-Many | articleId               | Review tracking       |
+| Article → ArticleApproved        | ArticleApproved        | One-to-Many | articleId               | Approval tracking     |
+| Article → ArticleIsRelevant      | ArticleIsRelevant      | One-to-Many | articleId               | Relevance marking     |
+| Article → EntityWhoFoundArticle  | EntityWhoFoundArticle  | Many-to-One | entityWhoFoundArticleId | Discovery attribution |
+| Article → NewsApiRequest         | NewsApiRequest         | Many-to-One | newsApiRequestId        | NewsAPI source        |
+| Article → NewsRssRequest         | NewsRssRequest         | Many-to-One | newsRssRequestId        | RSS source            |
 
 #### User Relationships
+
 User entity connects to multiple workflow tracking tables:
 
-| Relationship | Target Entity | Type | Foreign Key | Description |
-|-------------|---------------|------|-------------|-------------|
-| User → EntityWhoCategorizedArticle | EntityWhoCategorizedArticle | One-to-Many | userId | Human categorization |
-| User → EntityWhoFoundArticle | EntityWhoFoundArticle | One-to-Many | userId | Human discovery |
-| User → Report | Report | One-to-Many | userId | Report creation |
-| User → ArticleReviewed | ArticleReviewed | One-to-Many | userId | Review actions |
-| User → ArticleApproved | ArticleApproved | One-to-Many | userId | Approval actions |
-| User → ArticleIsRelevant | ArticleIsRelevant | One-to-Many | userId | Relevance decisions |
+| Relationship                       | Target Entity               | Type        | Foreign Key | Description          |
+| ---------------------------------- | --------------------------- | ----------- | ----------- | -------------------- |
+| User → EntityWhoCategorizedArticle | EntityWhoCategorizedArticle | One-to-Many | userId      | Human categorization |
+| User → EntityWhoFoundArticle       | EntityWhoFoundArticle       | One-to-Many | userId      | Human discovery      |
+| User → Report                      | Report                      | One-to-Many | userId      | Report creation      |
+| User → ArticleReviewed             | ArticleReviewed             | One-to-Many | userId      | Review actions       |
+| User → ArticleApproved             | ArticleApproved             | One-to-Many | userId      | Approval actions     |
+| User → ArticleIsRelevant           | ArticleIsRelevant           | One-to-Many | userId      | Relevance decisions  |
 
 ### Many-to-Many Relationships
 
 #### Article ↔ State (via ArticleStateContract)
+
 Articles can be associated with multiple states, states can have multiple articles:
 
 ```typescript
 Article.belongsToMany(State, {
-  through: ArticleStateContract,
-  foreignKey: 'articleId',
+	through: ArticleStateContract,
+	foreignKey: "articleId",
 });
 State.belongsToMany(Article, {
-  through: ArticleStateContract,
-  foreignKey: 'stateId',
+	through: ArticleStateContract,
+	foreignKey: "stateId",
 });
 ```
 
 #### Article ↔ EntityWhoCategorizedArticle (via ArticleEntityWhoCategorizedArticleContract)
+
 Complex many-to-many with additional rating data in junction table:
 
 ```typescript
 Article.hasMany(ArticleEntityWhoCategorizedArticleContract, {
-  foreignKey: 'articleId',
+	foreignKey: "articleId",
 });
-EntityWhoCategorizedArticle.hasMany(ArticleEntityWhoCategorizedArticleContract, {
-  foreignKey: 'entityWhoCategorizesId',
-});
+EntityWhoCategorizedArticle.hasMany(
+	ArticleEntityWhoCategorizedArticleContract,
+	{
+		foreignKey: "entityWhoCategorizesId",
+	}
+);
 ```
 
 #### NewsApiRequest ↔ WebsiteDomain (via NewsApiRequestWebsiteDomainContract)
+
 API requests can target multiple domains:
 
 ```typescript
 NewsApiRequest.belongsToMany(WebsiteDomain, {
-  through: NewsApiRequestWebsiteDomainContract,
-  foreignKey: 'newsApiRequestId',
+	through: NewsApiRequestWebsiteDomainContract,
+	foreignKey: "newsApiRequestId",
 });
 ```
 
 ### AI Integration Relationships
 
 #### Dual Entity Tracking Pattern
+
 The system tracks both human users and AI systems for categorization/discovery:
 
 ```
@@ -388,35 +372,37 @@ EntityWhoFoundArticle
 ### Self-Referencing Relationships
 
 #### ArticleDuplicateRating
+
 Self-referencing relationship comparing articles against each other:
 
 ```typescript
 // Article has many duplicate ratings as "new" article
 Article.hasMany(ArticleDuplicateRating, {
-  as: 'NewDuplicates',
-  foreignKey: 'articleIdNew',
+	as: "NewDuplicates",
+	foreignKey: "articleIdNew",
 });
 
 // Article has many duplicate ratings as "approved" comparison
 Article.hasMany(ArticleDuplicateRating, {
-  as: 'ApprovedDuplicates',
-  foreignKey: 'articleIdApproved',
+	as: "ApprovedDuplicates",
+	foreignKey: "articleIdApproved",
 });
 
 // Reverse relationships
 ArticleDuplicateRating.belongsTo(Article, {
-  as: 'NewArticle',
-  foreignKey: 'articleIdNew',
+	as: "NewArticle",
+	foreignKey: "articleIdNew",
 });
 ArticleDuplicateRating.belongsTo(Article, {
-  as: 'ApprovedArticle',
-  foreignKey: 'articleIdApproved',
+	as: "ApprovedArticle",
+	foreignKey: "articleIdApproved",
 });
 ```
 
 ### News Aggregation Relationships
 
 #### NewsArticleAggregatorSource Hub
+
 Central source management connecting to requests and geographical targeting:
 
 ```
@@ -436,6 +422,7 @@ Multiple tables follow the same pattern for tracking user actions on articles:
 - **ArticleIsRelevant**: User relevance marking
 
 Each connects:
+
 - User (userId) - Who performed the action
 - Article (articleId) - Which article was affected
 - Plus action-specific metadata fields
@@ -445,6 +432,7 @@ Each connects:
 **Total Associations**: 50+ Sequelize relationship definitions in `_associations.ts`
 
 **Key Patterns**:
+
 1. **Hub-and-Spoke**: Article as central entity connecting to specialized tables
 2. **Junction Tables**: Extensive many-to-many relationships via contract tables
 3. **Dual Tracking**: Human vs AI entity attribution

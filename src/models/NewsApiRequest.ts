@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface NewsApiRequestAttributes {
   id: number;
@@ -19,7 +19,7 @@ interface NewsApiRequestAttributes {
 
 interface NewsApiRequestCreationAttributes extends Optional<NewsApiRequestAttributes, 'id' | 'countOfArticlesReceivedFromRequest' | 'countOfArticlesSavedToDbFromRequest' | 'countOfArticlesAvailableFromRequest' | 'dateStartOfRequest' | 'dateEndOfRequest' | 'status' | 'url' | 'andString' | 'orString' | 'notString' | 'isFromAutomation'> {}
 
-class NewsApiRequest extends Model<NewsApiRequestAttributes, NewsApiRequestCreationAttributes> implements NewsApiRequestAttributes {
+export class NewsApiRequest extends Model<NewsApiRequestAttributes, NewsApiRequestCreationAttributes> implements NewsApiRequestAttributes {
   public id!: number;
   public newsArticleAggregatorSourceId!: number;
   public countOfArticlesReceivedFromRequest!: number | null;
@@ -38,7 +38,8 @@ class NewsApiRequest extends Model<NewsApiRequestAttributes, NewsApiRequestCreat
   public readonly updatedAt!: Date;
 }
 
-NewsApiRequest.init(
+export function initNewsApiRequest() {
+  NewsApiRequest.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -90,6 +91,8 @@ NewsApiRequest.init(
     tableName: 'NewsApiRequests',
     timestamps: true,
   }
-);
+  );
+  return NewsApiRequest;
+}
 
 export default NewsApiRequest;

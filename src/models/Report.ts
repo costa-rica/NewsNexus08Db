@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface ReportAttributes {
   id: number;
@@ -11,7 +11,7 @@ interface ReportAttributes {
 
 interface ReportCreationAttributes extends Optional<ReportAttributes, 'id' | 'dateSubmittedToClient' | 'nameCrFormat' | 'nameZipFile'> {}
 
-class Report extends Model<ReportAttributes, ReportCreationAttributes> implements ReportAttributes {
+export class Report extends Model<ReportAttributes, ReportCreationAttributes> implements ReportAttributes {
   public id!: number;
   public dateSubmittedToClient!: Date | null;
   public nameCrFormat!: string | null;
@@ -22,33 +22,36 @@ class Report extends Model<ReportAttributes, ReportCreationAttributes> implement
   public readonly updatedAt!: Date;
 }
 
-Report.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initReport() {
+  Report.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      dateSubmittedToClient: {
+        type: DataTypes.DATE,
+      },
+      nameCrFormat: {
+        type: DataTypes.STRING,
+      },
+      nameZipFile: {
+        type: DataTypes.STRING,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
-    dateSubmittedToClient: {
-      type: DataTypes.DATE,
-    },
-    nameCrFormat: {
-      type: DataTypes.STRING,
-    },
-    nameZipFile: {
-      type: DataTypes.STRING,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'Report',
-    tableName: 'Reports',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'Report',
+      tableName: 'Reports',
+      timestamps: true,
+    }
+  );
+  return Report;
+}
 
 export default Report;

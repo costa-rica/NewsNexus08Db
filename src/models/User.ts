@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface UserAttributes {
   id: number;
@@ -11,7 +11,7 @@ interface UserAttributes {
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'isAdmin'> {}
 
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number;
   public username!: string;
   public email!: string;
@@ -22,36 +22,39 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public readonly updatedAt!: Date;
 }
 
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initUser() {
+  User.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    isAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'User',
-    tableName: 'Users',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'User',
+      tableName: 'Users',
+      timestamps: true,
+    }
+  );
+  return User;
+}
 
 export default User;

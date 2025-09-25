@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from './_connection';
+import { sequelize } from './_connection';
 
 interface NewsApiRequestWebsiteDomainContractAttributes {
   id: number;
@@ -10,7 +10,7 @@ interface NewsApiRequestWebsiteDomainContractAttributes {
 
 interface NewsApiRequestWebsiteDomainContractCreationAttributes extends Optional<NewsApiRequestWebsiteDomainContractAttributes, 'id' | 'newsApiRequestId' | 'websiteDomainId' | 'includedOrExcludedFromRequest'> {}
 
-class NewsApiRequestWebsiteDomainContract extends Model<NewsApiRequestWebsiteDomainContractAttributes, NewsApiRequestWebsiteDomainContractCreationAttributes> implements NewsApiRequestWebsiteDomainContractAttributes {
+export class NewsApiRequestWebsiteDomainContract extends Model<NewsApiRequestWebsiteDomainContractAttributes, NewsApiRequestWebsiteDomainContractCreationAttributes> implements NewsApiRequestWebsiteDomainContractAttributes {
   public id!: number;
   public newsApiRequestId!: number | null;
   public websiteDomainId!: number | null;
@@ -20,30 +20,33 @@ class NewsApiRequestWebsiteDomainContract extends Model<NewsApiRequestWebsiteDom
   public readonly updatedAt!: Date;
 }
 
-NewsApiRequestWebsiteDomainContract.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+export function initNewsApiRequestWebsiteDomainContract() {
+  NewsApiRequestWebsiteDomainContract.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      newsApiRequestId: {
+        type: DataTypes.INTEGER,
+      },
+      websiteDomainId: {
+        type: DataTypes.INTEGER,
+      },
+      includedOrExcludedFromRequest: {
+        type: DataTypes.STRING,
+        defaultValue: "included",
+      },
     },
-    newsApiRequestId: {
-      type: DataTypes.INTEGER,
-    },
-    websiteDomainId: {
-      type: DataTypes.INTEGER,
-    },
-    includedOrExcludedFromRequest: {
-      type: DataTypes.STRING,
-      defaultValue: "included",
-    },
-  },
-  {
-    sequelize,
-    modelName: 'NewsApiRequestWebsiteDomainContract',
-    tableName: 'NewsApiRequestWebsiteDomainContracts',
-    timestamps: true,
-  }
-);
+    {
+      sequelize,
+      modelName: 'NewsApiRequestWebsiteDomainContract',
+      tableName: 'NewsApiRequestWebsiteDomainContracts',
+      timestamps: true,
+    }
+  );
+  return NewsApiRequestWebsiteDomainContract;
+}
 
 export default NewsApiRequestWebsiteDomainContract;
